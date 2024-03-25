@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.example.abbs.entity.User;
 import com.example.springSecurity.entity.SecurityUser;
 import com.example.springSecurity.service.SecurityUserService;
 import com.example.springSecurity.util.ImageUtil;
@@ -67,12 +66,12 @@ public class SecurityUserController {
 		}
 		String hashedPwd = bCryptEncoder.encode(pwd);
 		securityUser = SecurityUser.builder()
-				.uid(uid).pwd(hashedPwd).uname(uname).email(email)
+				.uid(uid).pwd(hashedPwd).uname(uname).email(email).provider("ck world")
 				.picture("/ss/file/download/profile/" + filename)
 				.build();
-		userService.registerUser(user);
+		securityService.insertSecurityUser(securityUser);
 		model.addAttribute("msg", "등록을 마쳤습니다. 로그인하세요.");
-		model.addAttribute("url", "/abbs/user/login");
+		model.addAttribute("url", "/ss/user/login");
 		return "common/alertMsg";
 	}
 	
