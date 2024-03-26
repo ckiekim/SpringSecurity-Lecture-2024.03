@@ -197,7 +197,6 @@ public class SecurityUserController {
 			securityUser = SecurityUser.builder()
 					.uid(uid).pwd(hashedPwd).uname(uname).email(email).picture(picture)
 					.provider(provider).role(role).build();
-			System.out.println(securityUser);
 			session.setAttribute("sessUname", uname);
 			session.setAttribute("picture", picture);
 			session.setAttribute("email", email);
@@ -224,6 +223,5 @@ public class SecurityUserController {
 			return "common/alertMsg";
 		}
 	}
-	
 	
 }
