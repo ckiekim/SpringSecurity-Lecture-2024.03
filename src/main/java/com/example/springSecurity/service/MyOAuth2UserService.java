@@ -108,6 +108,23 @@ public class MyOAuth2UserService extends DefaultOAuth2UserService {
 				log.info("카카오 계정을 통해 회원가입이 되었습니다.");
 			}
 			break;
+			
+		case "facebook": // id(String), name, email
+            String fid = oAuth2User.getAttribute("id");
+            uid = provider + "_" + fid;
+            securityUser = securityService.getUserByUid(uid);
+            if (securityUser == null) {
+                uname = oAuth2User.getAttribute("name");
+                uname = (uname == null) ? "facebook_user" : uname;
+                email = oAuth2User.getAttribute("email");
+                securityUser = SecurityUser.builder()
+                        .uid(uid).pwd(hashedPwd).uname(uname).email(email).provider(provider)
+                        .build();
+                securityService.insertSecurityUser(securityUser);
+                securityUser = securityService.getUserByUid(uid);
+                log.info("페이스북 계정을 통해 회원가입이 되었습니다.");
+            }
+            break;
 		}
 		
 		return new MyUserDetails(securityUser, oAuth2User.getAttributes());
