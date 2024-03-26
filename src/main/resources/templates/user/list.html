@@ -6,10 +6,10 @@
 		function uidClick(uid) {
 			$.ajax({
 				type: 'GET',
-				url: '/sbbs/user/detail/' + uid,
+				url: '/ss/user/detail/' + uid,
 				success: function(jsonUser) {
 					let user = JSON.parse(jsonUser);
-					$('#imgSrc').attr({src: user.profile});
+					$('#imgSrc').attr({src: user.picture});
 					$('#suid').val(user.suid);
 					$('#uid').val(user.uid);
 					$('#hashedPwd').val(user.pwd);
@@ -17,10 +17,7 @@
 					$('#email').val(user.email);
 					$('#provider').val(user.provider);
 					$('#role').val(user.role);
-					$('#profile').val(user.profile);
-					$('#github').val(user.github);
-					$('#insta').val(user.insta);
-					$('#location').val(user.location);
+					$('#picture').val(user.picture);
 					$('#detailModal').modal('show');
 				}
 			});
@@ -29,7 +26,7 @@
 			let uid = $('#uid').val();
 			const answer = confirm('정말로 삭제하시겠습니까?');
 			if (answer)
-				location.href = '/sbbs/user/delete/' + uid;
+				location.href = '/ss/user/delete/' + uid;
 		}
 	</script>
 </head>
@@ -52,7 +49,7 @@
 							<th>이메일</th><th>등록일</th><th>역할</th>
 						</tr>
 						<tr th:each="user: ${userList}">
-							<td style="text-align: center;"><img th:src="${user.profile}" class="rounded-circle" height="28"></td>
+							<td style="text-align: center;"><img th:src="${user.picture}" class="rounded-circle" height="28"></td>
 							<td>
 								<a href="#" th:onclick="uidClick([[${user.uid}]])">
 									<span th:text="${#strings.length(user.uid) > 11 ? #strings.substring(user.uid, 0, 10) + '...' : user.uid}"></span>
