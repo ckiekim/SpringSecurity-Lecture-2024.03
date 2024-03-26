@@ -33,6 +33,21 @@ public class MyOAuth2UserService extends DefaultOAuth2UserService {
 		String provider = userRequest.getClientRegistration().getRegistrationId();
 		switch (provider) {
 		case "google":
+			String providerId = oAuth2User.getAttribute("sub");
+			uid = provider + "_" + providerId;
+			securityUser = securityService.getUserByUid(uid);
+			if (securityUser == null) {				// 가입이 안되어 있으므로 가입 진행
+				uname = oAuth2User.getAttribute("name");
+				uname = (uname == null) ? "google_user" : uname;
+				email = oAuth2User.getAttribute("email");
+				picture = oAuth2User.getAttribute("picture");
+				securityUser = SecurityUser.builder()
+						.uid(uid).pwd(hashedPwd).uname(uname).email(email).picture(picture)
+						.provider(provider).build();
+				securityService.insertSecurityUser(securityUser);
+				securityUser = securityService.getUserByUid(uid);
+				log.info("구글 계정을 통해 회원가입이 되었습니다.");
+			}
 			break;
 			
 		case "github":
@@ -41,6 +56,7 @@ public class MyOAuth2UserService extends DefaultOAuth2UserService {
 			securityUser = securityService.getUserByUid(uid);
 			if (securityUser == null) {				// 가입이 안되어 있으므로 가입 진행
 				uname = oAuth2User.getAttribute("name");
+				uname = (uname == null) ? "github_user" : uname;
 				email = oAuth2User.getAttribute("email");
 				picture = oAuth2User.getAttribute("avatar_url");
 				securityUser = SecurityUser.builder()
