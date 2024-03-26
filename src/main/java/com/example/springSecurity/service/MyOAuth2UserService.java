@@ -90,6 +90,23 @@ public class MyOAuth2UserService extends DefaultOAuth2UserService {
 			break;
 			
 		case "kakao":
+			long kid = (long) oAuth2User.getAttribute("id");
+			uid = provider + "_" + kid;
+			securityUser = securityService.getUserByUid(uid);
+			if (securityUser == null) {				// 가입이 안되어 있으므로 가입 진행
+				Map<String, String> properties = (Map) oAuth2User.getAttribute("properties");
+				Map<String, Object> account = (Map) oAuth2User.getAttribute("kakao_account");
+				uname = (String) properties.get("nickname");
+				uname = (uname == null) ? "kakao_user" : uname;
+				email = (String) account.get("email");
+				picture = (String) properties.get("profile_image");
+				securityUser = SecurityUser.builder()
+						.uid(uid).pwd(hashedPwd).uname(uname).email(email).picture(picture)
+						.provider(provider).build();
+				securityService.insertSecurityUser(securityUser);
+				securityUser = securityService.getUserByUid(uid);
+				log.info("카카오 계정을 통해 회원가입이 되었습니다.");
+			}
 			break;
 		}
 		
