@@ -1,5 +1,7 @@
 package com.example.springSecurity.service;
 
+import java.util.Map;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -33,8 +35,8 @@ public class MyOAuth2UserService extends DefaultOAuth2UserService {
 		String provider = userRequest.getClientRegistration().getRegistrationId();
 		switch (provider) {
 		case "google":
-			String providerId = oAuth2User.getAttribute("sub");
-			uid = provider + "_" + providerId;
+			String gid = oAuth2User.getAttribute("sub");
+			uid = provider + "_" + gid;
 			securityUser = securityService.getUserByUid(uid);
 			if (securityUser == null) {				// 가입이 안되어 있으므로 가입 진행
 				uname = oAuth2User.getAttribute("name");
@@ -69,6 +71,22 @@ public class MyOAuth2UserService extends DefaultOAuth2UserService {
 			break;
 			
 		case "naver":
+			Map<String, Object> response = (Map) oAuth2User.getAttribute("response");
+			String nid = (String) response.get("id");
+			uid = provider + "_" + nid;
+			securityUser = securityService.getUserByUid(uid);
+			if (securityUser == null) {				// 가입이 안되어 있으므로 가입 진행
+				uname = (String) response.get("nickname");
+				uname = (uname == null) ? "naver_user" : uname;
+				email = (String) response.get("email");
+				picture = (String) response.get("profile_image");
+				securityUser = SecurityUser.builder()
+						.uid(uid).pwd(hashedPwd).uname(uname).email(email).picture(picture)
+						.provider(provider).build();
+				securityService.insertSecurityUser(securityUser);
+				securityUser = securityService.getUserByUid(uid);
+				log.info("네이버 계정을 통해 회원가입이 되었습니다.");
+			}
 			break;
 			
 		case "kakao":
